@@ -8,7 +8,7 @@ def main():
     URLS = get_urls()
     
     # examine which worlds need to be updated
-    worlds_to_update = os.listdir("/var/www/np.bmaker.net/include/servers/de")
+    worlds_to_update = os.listdir("/home/nopaste/production/data/server/de")
     before = set(worlds_to_update)
     
     worlds_to_update = filter(lambda x: x in URLS.keys(), worlds_to_update)
