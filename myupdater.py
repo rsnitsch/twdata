@@ -8,9 +8,12 @@ def main():
     URLS = get_urls()
     
     # examine which worlds need to be updated
-    worlds_to_update = os.listdir("/home/nopaste/production/data/server/de")
-    before = set(worlds_to_update)
+    if len(sys.argv) > 1:
+        worlds_to_update = sys.argv[1:]
+    else:
+        worlds_to_update = os.listdir("/home/nopaste/production/data/server/de")
     
+    before = set(worlds_to_update)
     worlds_to_update = filter(lambda x: x in URLS.keys(), worlds_to_update)
     after = set(worlds_to_update)
     
