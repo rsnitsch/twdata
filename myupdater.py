@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys, os, time, urllib, subprocess
+import sys, os, time, urllib, subprocess, ConfigParser
 from xml.dom.minidom import parse
 
 URLS = {}
@@ -7,11 +7,20 @@ URLS = {}
 def main():
     URLS = get_urls()
     
+    config = ConfigParser.ConfigParser()
+    config.read(['config.ini', 'config.sample.ini'])
+    path_to_dsnopaste = config.get('config', 'path_to_dsnopaste')
+    
     # examine which worlds need to be updated
     if len(sys.argv) > 1:
         worlds_to_update = sys.argv[1:]
     else:
-        worlds_to_update = os.listdir("/home/nopaste/production/data/server/de")
+        dsnopaste_server_dir = os.path.join(path_to_dsnopaste, 'data/server/de')
+        if os.path.isdir(dsnopaste_server_dir):
+            worlds_to_update = os.listdir(dsnopaste_server_dir)
+        else:
+            print "Error: Could not automatically determine list of worlds that should be updated. Reason: The DS NoPaste server directory does not exist or cannot be accessed. Expected location: " + dsnopaste_server_dir
+            sys.exit(1)
     
     before = set(worlds_to_update)
     worlds_to_update = filter(lambda x: x in URLS.keys(), worlds_to_update)
@@ -52,8 +61,10 @@ def main():
         # e.g.: http://de30.ds.de/village.txt.gz|data/de30_village.txt.gz ...
         urlstring = " ".join(["%s\|%s" % (item.remote_url, item.destination_file) \
                               for item in really_needed])
-        subprocess.call("python2.6 fastdl.py %s %s" % ("data", urlstring),
-                        shell=True)
+        returncode = subprocess.call("python2 fastdl.py %s %s" % ("data", urlstring), shell=True)
+        if returncode != 0:
+            print "Downloading of world data failed. Execution of fastdl.py resulted in returncode %d" % returncode
+            sys.exit(1)
     else:
         print "No files to download. Each file has already been downloaded in the last 3600 seconds."
         print "Nothing to be done."
@@ -78,8 +89,10 @@ def main():
     # 3. decode
     files_to_decode = [file[:-3] for file in files_to_unzip]
     if len(files_to_decode) > 0:
-        subprocess.call("python urldecode.py %s" % " ".join(files_to_decode),
-                        shell=True)
+        returncode = subprocess.call("python urldecode.py %s" % " ".join(files_to_decode), shell=True)
+        if returncode != 0:
+            print "Error: Decoding of unzipped world data failed. Execution of urldecode.py resulted in returncode %d" % returncode
+            sys.exit(1)
     
     Timer.interval_msg("Decoding took %f seconds.", "decoding")
     
@@ -101,6 +114,10 @@ def main():
     print " Decoding:    %ss" % Timer.get("decoding", 3)
     print " Importing:   %ss" % Timer.get("importing", 3)
     
+def ensure_folder_exists(folder_path):
+    if not os.path.isdir(folder_path):
+        os.mkdir(folder_path)
+
 def get_urls():
     if not os.path.exists("cache/urls_xml.cache") or \
         (time.time() - os.stat("cache/urls_xml.cache").st_mtime) > 3600:

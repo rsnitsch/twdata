@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 """
 Downloads up to 10 files simultaneously (and thus making use of very fast
@@ -26,7 +26,7 @@ def main():
     
     # validate destination directory
     if not os.path.isdir(destination_directory):
-        print "Error: invalid destination directory\n"
+        print "Error: Destination directory does not exist: " + destination_directory
         sys.exit(2)
         
     # make urls distinct, so there is no URL that is downloaded twice.

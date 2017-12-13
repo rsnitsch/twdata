@@ -4,11 +4,6 @@
      * @package: TWData
      */
     
-    define('TWD_MYSQL_HOST', 'localhost');
-    define('TWD_MYSQL_DATABASE', 'twdata');
-    define('TWD_MYSQL_USER', 'twdata');
-    define('TWD_MYSQL_PASS', 'nY7tpBwpfhYwBjSS');
-    
     define('TWD_CREATE_ALLY_TABLE_TEMPLATE',
            "CREATE TABLE `<world_id>_ally` (
   `id` mediumint(8) unsigned NOT NULL,

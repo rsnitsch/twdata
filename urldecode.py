@@ -42,6 +42,11 @@ def main():
         print "In the given files, replaces %xx escapes by their single-character equivalent \
 and plus signs by spaces."
         sys.exit(1)
+        
+    if not os.path.isfile("twdecoder"):
+        print "Error: twdecoder executable does not exist. You need to compile twdecoder.cpp first."
+        print "Hint: To compile, execute the following command: g++ twdecoder.cpp -o twdecoder -O3 -Wall"
+        sys.exit(1)
     
     files = sys.argv[1:]
     

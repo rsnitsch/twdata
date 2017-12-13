@@ -7,18 +7,10 @@
      */
     
     final class TWData {
-        
-        /*
-    define('TWD_MYSQL_HOST', 'localhost');
-    define('TWD_MYSQL_DATABASE', 'twdata');
-    define('TWD_MYSQL_USER', 'twdata');
-    define('TWD_MYSQL_PASS', 'nsTPrtyJu8dmzqPM');
-        */
-    
         private static $db_host = 'localhost';
         private static $db_name = 'twdata';
         private static $db_user = 'twdata';
-        private static $db_pass = 'nY7tpBwpfhYwBjSS';
+        private static $db_pass = 'twdata';
         
         /**
          * Establishes the connection to the database and returns the handle.
@@ -32,6 +24,20 @@
             static $pdo = null;
             
             if($pdo == null) {
+                // Parse database credentials from config file.
+                if (file_exists(dirname(__FILE__).'/config.ini')) {
+                    $config = parse_ini_file(dirname(__FILE__).'/config.ini', false);
+                } else if (file_exists(dirname(__FILE__).'/config.sample.ini')) {
+                    $config = parse_ini_file(dirname(__FILE__).'/config.sample.ini', false);
+                } else {
+                    throw new Exception("TWData config file does not exist.");
+                }
+                
+                self::$db_host = $config["db_host"];
+                self::$db_name = $config["db_name"];
+                self::$db_user = $config["db_user"];
+                self::$db_pass = $config["db_pass"];
+                
                 // for security reasons:
                 // encapsulate in try-catch to prevent exceptions' backtraces to expose
                 // database credentials (in case for some reason the exception isnt
